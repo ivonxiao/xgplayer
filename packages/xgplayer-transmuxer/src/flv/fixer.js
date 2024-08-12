@@ -297,13 +297,19 @@ export class FlvFixer {
 
   _doFixAudioInternal (audioTrack, samples, timescale) {
     if (!audioTrack.sampleDuration) {
-      audioTrack.sampleDuration = audioTrack.codecType === AudioCodecType.AAC
-        ? AAC.getFrameDuration(audioTrack.timescale, timescale)
-        : this._getG711Duration(audioTrack)
+      audioTrack.sampleDuration =
+        audioTrack.codecType === AudioCodecType.AAC ||
+        audioTrack.codecType === AudioCodecType.OPUS
+          ? AAC.getFrameDuration(audioTrack.timescale, timescale)
+          : this._getG711Duration(audioTrack)
     }
     const refSampleDuration = audioTrack.sampleDuration
 
-    const sampleDurationInSampleRate = audioTrack.codecType === AudioCodecType.AAC ? 1024 : refSampleDuration * audioTrack.timescale / 1000
+    const sampleDurationInSampleRate =
+      audioTrack.codecType === AudioCodecType.AAC ||
+      audioTrack.codecType === AudioCodecType.OPUS
+        ? 1024
+        : (refSampleDuration * audioTrack.timescale) / 1000
 
     if (this._audioNextPts === undefined) {
       const samp0 = samples[0]
